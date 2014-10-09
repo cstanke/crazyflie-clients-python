@@ -44,7 +44,7 @@ class PyGameReader():
     def start_input(self, deviceId, inputMap):
         """Initalize the reading and open the device with deviceId and set the mapping for axis/buttons using the
         inputMap"""
-        self.data = {"roll":0.0, "pitch":0.0, "yaw":0.0, "thrust":0.0, "pitchcal":0.0, "rollcal":0.0, "estop": False, "exit":False, "althold":False}
+        self.data = {"roll":0.0, "pitch":0.0, "yaw":0.0, "thrust":0.0, "pitchcal":0.0, "rollcal":0.0, "estop": False, "exit":False, "althold":False, "ring_effect":False}
         self.inputMap = inputMap
         self.j = pygame.joystick.Joystick(deviceId)
         self.j.init()
@@ -81,7 +81,9 @@ class PyGameReader():
                     elif (key == "exit"):
                         self.data["exit"] = True
                     elif (key == "althold"):
-                        self.data["althold"] = not self.data["althold"]                        
+                        self.data["althold"] = not self.data["althold"]
+                    elif (key == "ring_effect"):
+                        self.data["ring_effect"] = not self.data["ring_effect"]         
                     else: # Generic cal for pitch/roll
                         self.data[key] = self.inputMap[index]["scale"]
             except Exception:

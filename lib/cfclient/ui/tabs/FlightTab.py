@@ -107,6 +107,9 @@ class FlightTab(Tab, flight_tab_class):
         
         self.helper.inputDeviceReader.althold_updated.add_callback(
                     lambda enabled: self.helper.cf.param.set_value("flightmode.althold", enabled))
+                    
+        self.helper.inputDeviceReader.ring_effect_updated.add_callback(
+                    lambda effect: self.helper.cf.param.set_value("ring.effect", effect))
 
         self._imu_data_signal.connect(self._imu_data_received)
         self._baro_data_signal.connect(self._baro_data_received)

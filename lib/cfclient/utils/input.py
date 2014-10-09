@@ -85,6 +85,8 @@ class JoystickReader:
 
         self._trim_roll = Config().get("trim_roll")
         self._trim_pitch = Config().get("trim_pitch")
+        self._old_ring_effect_button_state = Config().get("ring_effect")
+        self._ring_effect = 0
 
         if (Config().get("flightmode") is "Normal"):
             self._max_yaw_rate = Config().get("normal_max_yaw")
@@ -144,12 +146,13 @@ class JoystickReader:
         self.device_discovery = Caller()
         self.device_error = Caller()
         self.althold_updated = Caller()
+        self.ring_effect_updated = Caller()
 
     def setAltHoldAvailable(self, available):
         self._has_pressure_sensor = available
 
     def setAltHold(self, althold):
-        self._old_alt_hold = althold
+        self._old_alt_hold = althold        
 
     def _do_device_discovery(self):
         devs = self.getAvailableDevices()
@@ -253,7 +256,17 @@ class JoystickReader:
             emergency_stop = data["estop"]
             trim_roll = data["rollcal"]
             trim_pitch = data["pitchcal"]
+            ring_effect_button_state = data["ring_effect"]
             althold = data["althold"]
+            
+            if self._old_ring_effect_button_state != ring_effect_button_state:                    
+                if self._ring_effect + 1 > Config().get("ring_max_effect"):
+                    self._ring_effect = 0
+                else:
+                    self._ring_effect += 1
+        
+                self.ring_effect_updated.call(str(self._ring_effect))
+                self._old_ring_effect_button_state = ring_effect_button_state
 
             if (self._old_alt_hold != althold):
                 self.althold_updated.call(str(althold))
