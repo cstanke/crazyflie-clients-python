@@ -30,6 +30,6 @@
     "default_cf_channel": 10,
     "default_cf_speed": 0,
     "default_cf_trim": 0,
-    "ring_max_effect": 4
+    "ring_max_effect": 5
   }
 }

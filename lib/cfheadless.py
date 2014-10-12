@@ -94,6 +94,8 @@ class HeadlessClient():
                     self._jr.setAltHoldAvailable(eval(found))))
         self._jr.althold_updated.add_callback(
                 lambda enabled: self._cf.param.set_value("flightmode.althold", enabled))
+        self._jr.ring_effect_updated.add_callback(
+                lambda effect: self._cf.param.set_value("ring.effect", effect))
 
         self._cf.open_link(link_uri)
         self._jr.input_updated.add_callback(self._cf.commander.send_setpoint)
