@@ -85,6 +85,9 @@ class JoystickReader:
 
         self._trim_roll = Config().get("trim_roll")
         self._trim_pitch = Config().get("trim_pitch")
+        # 2014-11-17 chad: 
+        # Initialize the button state to a default value listed in the cfclient
+        # config file. "ring_effect" is a RW value.
         self._old_ring_effect_button_state = Config().get("ring_effect")
         self._ring_effect = 0
 
@@ -146,6 +149,10 @@ class JoystickReader:
         self.device_discovery = Caller()
         self.device_error = Caller()
         self.althold_updated = Caller()
+        # 2014-11-17 chad: 
+        # Set up a callback for when the ring_effect value has been updated
+        # so we can tell the currently connected CrazyFlie to change its
+        # NeoPixel ring effect.
         self.ring_effect_updated = Caller()
 
     def setAltHoldAvailable(self, available):
@@ -244,6 +251,13 @@ class JoystickReader:
         """Set a new value for the trim trim."""
         self._trim_pitch = trim_pitch
 
+    # 2014-11-17 chad:
+    # This is a callback function we pass to cf.param to get the maximum number
+    # of NeoPixel ring effects in the currently connected CrazyFlie's firmware.
+    def set_ring_effect_max(self, name, value):
+        """Set the max number of neopixel ring effects."""
+        self._ring_effect_max = int(value)
+
     def read_input(self):
         """Read input data from the selected device"""
         try:
@@ -259,8 +273,13 @@ class JoystickReader:
             ring_effect_button_state = data["ring_effect"]
             althold = data["althold"]
             
+            # 2014-11-17 chad: 
+            # If our specified controller button has been pressed, increment
+            # the NeoPixel Ring effect number unless it is greater than the
+            # maximum number of available effects - according to the connected
+            # CrazyFlies ring.neffect RO parameter.
             if self._old_ring_effect_button_state != ring_effect_button_state:                    
-                if self._ring_effect + 1 > Config().get("ring_max_effect"):
+                if self._ring_effect + 1 > self._ring_effect_max:
                     self._ring_effect = 0
                 else:
                     self._ring_effect += 1

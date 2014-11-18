@@ -107,7 +107,17 @@ class FlightTab(Tab, flight_tab_class):
         
         self.helper.inputDeviceReader.althold_updated.add_callback(
                     lambda enabled: self.helper.cf.param.set_value("flightmode.althold", enabled))
-                    
+        
+        # 2014-11-17 chad: 
+        # Add a callback so we can get the maximum number of NeoPixel ring
+        # effects in the currently connected CrazyFlie's firmware. We'll use
+        # this when the inout device is selecting the available effects.
+        self.helper.cf.param.add_update_callback(group="ring", name="neffect",
+                           cb=self.helper.inputDeviceReader.set_ring_effect_max)
+        # 2014-11-17 chad: 
+        # Add a callback to the input device reader so we can tell the currently
+        # connected CrayFlie to change it's NeoPixel ring effect based on user
+        # input.
         self.helper.inputDeviceReader.ring_effect_updated.add_callback(
                     lambda effect: self.helper.cf.param.set_value("ring.effect", effect))
 
