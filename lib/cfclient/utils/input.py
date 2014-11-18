@@ -87,9 +87,12 @@ class JoystickReader:
         self._trim_pitch = Config().get("trim_pitch")
         # 2014-11-17 chad: 
         # Initialize the button state to a default value listed in the cfclient
-        # config file. "ring_effect" is a RW value.
+        # config file. "ring_effect" is a RW value. Set the _ring_effect_max
+        # to 0 in case the currently connected CrazyFlie doesn't have fimrware
+        # support for NeoPixel ring.
         self._old_ring_effect_button_state = Config().get("ring_effect")
         self._ring_effect = 0
+        self._ring_effect_max = 0
 
         if (Config().get("flightmode") is "Normal"):
             self._max_yaw_rate = Config().get("normal_max_yaw")
@@ -275,15 +278,17 @@ class JoystickReader:
             
             # 2014-11-17 chad: 
             # If our specified controller button has been pressed, increment
-            # the NeoPixel Ring effect number unless it is greater than the
+            # the NeoPixel ring effect number unless it is greater than the
             # maximum number of available effects - according to the connected
-            # CrazyFlies ring.neffect RO parameter.
-            if self._old_ring_effect_button_state != ring_effect_button_state:                    
+            # CrazyFlie's ring.neffect RO parameter. If the currently connected
+            # CrazyFlie does not have NeoPixel ring support in its firmware,
+            # the _ring_effect_max will be 0 and we'll do nothing here.
+            if (self._old_ring_effect_button_state != ring_effect_button_state and
+                self._ring_effect_max != 0):                    
                 if self._ring_effect + 1 > self._ring_effect_max:
                     self._ring_effect = 0
                 else:
                     self._ring_effect += 1
-        
                 self.ring_effect_updated.call(str(self._ring_effect))
                 self._old_ring_effect_button_state = ring_effect_button_state
 
