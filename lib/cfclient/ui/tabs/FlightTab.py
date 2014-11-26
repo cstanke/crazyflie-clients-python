@@ -110,7 +110,7 @@ class FlightTab(Tab, flight_tab_class):
         
         # 2014-11-17 chad: 
         # Add a callback so we can get the maximum number of NeoPixel ring
-        # effects in the currently connected CrazyFlie's firmware. We'll use
+        # effects in the currently connected Crazyflie's firmware. We'll use
         # this when the inout device is selecting the available effects.
         self.helper.cf.param.add_update_callback(group="ring", name="neffect",
                            cb=self.helper.inputDeviceReader.set_ring_effect_max)

@@ -88,7 +88,7 @@ class JoystickReader:
         # 2014-11-17 chad: 
         # Initialize the button state to a default value listed in the cfclient
         # config file. "ring_effect" is a RW value. Set the _ring_effect_max
-        # to 0 in case the currently connected CrazyFlie doesn't have fimrware
+        # to 0 in case the currently connected Crazyflie doesn't have fimrware
         # support for NeoPixel ring.
         self._old_ring_effect_button_state = Config().get("ring_effect")
         self._ring_effect = 0
@@ -154,7 +154,7 @@ class JoystickReader:
         self.althold_updated = Caller()
         # 2014-11-17 chad: 
         # Set up a callback for when the ring_effect value has been updated
-        # so we can tell the currently connected CrazyFlie to change its
+        # so we can tell the currently connected Crazyflie to change its
         # NeoPixel ring effect.
         self.ring_effect_updated = Caller()
 
@@ -256,7 +256,7 @@ class JoystickReader:
 
     # 2014-11-17 chad:
     # This is a callback function we pass to cf.param to get the maximum number
-    # of NeoPixel ring effects in the currently connected CrazyFlie's firmware.
+    # of NeoPixel ring effects in the currently connected Crazyflie's firmware.
     def set_ring_effect_max(self, name, value):
         """Set the max number of neopixel ring effects."""
         self._ring_effect_max = int(value)
@@ -280,11 +280,11 @@ class JoystickReader:
             # If our specified controller button has been pressed, increment
             # the NeoPixel ring effect number unless it is greater than the
             # maximum number of available effects - according to the connected
-            # CrazyFlie's ring.neffect RO parameter. If the currently connected
-            # CrazyFlie does not have NeoPixel ring support in its firmware,
+            # Crazyflie's ring.neffect RO parameter. If the currently connected
+            # Crazyflie does not have NeoPixel ring support in its firmware,
             # the _ring_effect_max will be 0 and we'll do nothing here.
             if (self._old_ring_effect_button_state != ring_effect_button_state and
-                self._ring_effect_max != 0):                    
+               self._ring_effect_max != 0):
                 if self._ring_effect + 1 > self._ring_effect_max:
                     self._ring_effect = 0
                 else:

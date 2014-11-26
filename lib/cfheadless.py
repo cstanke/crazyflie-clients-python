@@ -89,6 +89,8 @@ class HeadlessClient():
     def connect_crazyflie(self, link_uri):
         """Connect to a Crazyflie on the given link uri"""
         self._cf.connection_failed.add_callback(self._connection_failed)
+        # 2014-11-25 chad: Add a callback for when we have a good connection.
+        self._cf.connected.add_callback(self._connected)
         self._cf.param.add_update_callback(group="imu_sensors", name="HMC5883L",
                 cb=(lambda name, found:
                     self._jr.setAltHoldAvailable(eval(found))))
@@ -97,8 +99,28 @@ class HeadlessClient():
         self._jr.ring_effect_updated.add_callback(
                 lambda effect: self._cf.param.set_value("ring.effect", effect))
 
+        # 2014-11-18 chad: Set up callbacks to support NeoPixel ring effects
+        # in the firmware of the currently connected Crazyflie.
+        self._cf.param.add_update_callback(group="ring", name="neffect",
+                           cb=self._jr.set_ring_effect_max)
+        self._jr.ring_effect_updated.add_callback(
+                lambda effect: self._cf.param.set_value("ring.effect", effect))
+
+
         self._cf.open_link(link_uri)
         self._jr.input_updated.add_callback(self._cf.commander.send_setpoint)
+
+    def _connected(self, link):
+        """Callback for a successsful Crazyflie connection."""
+        # 2014-11-25 chad: When we are connected to the Crazyflie, request a
+        # parameter update for the following parameters...
+        param_list = ["imu_sensors.HMC5883L", "ring.neffect"]
+        for param in param_list:
+            try:
+                self._cf.param.request_param_update(param)
+            except Exception:
+                pass
+            
 
     def _connection_failed(self, link, message):
         """Callback for a failed Crazyflie connection"""
