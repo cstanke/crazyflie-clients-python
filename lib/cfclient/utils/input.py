@@ -162,7 +162,7 @@ class JoystickReader:
         self._has_pressure_sensor = available
 
     def setAltHold(self, althold):
-        self._old_alt_hold = althold        
+        self._old_alt_hold = althold
 
     def _do_device_discovery(self):
         devs = self.getAvailableDevices()
