@@ -118,7 +118,6 @@ class HeadlessClient():
                 self._cf.param.request_param_update(param)
             except Exception:
                 pass
-            
 
     def _connection_failed(self, link, message):
         """Callback for a failed Crazyflie connection"""

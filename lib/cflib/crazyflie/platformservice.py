@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
 #     ||          ____  _ __
 #  +------+      / __ )(_) /_______________ _____  ___
 #  | 0xBC |     / __  / / __/ ___/ ___/ __ `/_  / / _ \
@@ -18,34 +20,41 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#
+
 #  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software Foundation,
-#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA  02110-1301, USA.
 
 """
-Multiplatform python joystick driver
-Back-end currently implemented for linux_udev and pygame
+Used for sending control setpoints to the Crazyflie
 """
 
-from .constants import TYPE_BUTTON, TYPE_AXIS
+__author__ = 'Bitcraze AB'
+__all__ = ['PlatformService']
 
-try:
-    import linuxjsdev
+from cflib.crtp.crtpstack import CRTPPacket, CRTPPort
+import struct
 
-    if not locals().has_key('Joystick'):
-        from .linuxjsdev import Joystick
-except ImportError:
-    pass
 
-try:
-    import pygamejoystick
+class PlatformService():
+    """
+    Used for sending control setpoints to the Crazyflie
+    """
 
-    if not locals().has_key('Joystick'):
-        from .pygamejoystick import Joystick
-except ImportError:
-    pass
+    def __init__(self, crazyflie=None):
+        """
+        Initialize the platform object.
+        """
+        self._cf = crazyflie
 
-if not locals().has_key('Joystick'):
-    raise Exception("No suitable Joystick driver. " +
-                    "Driver supported: Linux, pygame.")
+    def set_continous_wave(self, enabled):
+        """
+        Enable/disable the client side X-mode. When enabled this recalculates
+        the setpoints before sending them to the Crazyflie.
+        """
+        pk = CRTPPacket()
+        pk.set_header(CRTPPort.PLATFORM, 0)
+        pk.data = (0, enabled)
+        self._cf.send_packet(pk)
+
