@@ -32,7 +32,7 @@ This module reads input from joysticks or other input devices and sends control
 set-points to the Crazyflie. It can be configured in the UI.
 
 Various drivers can be used to read input device data. Currently is uses the
-PySDL2 driver, but in the future native support will be provided for Linux and
+PyGame driver, but in the future native support will be provided for Linux and
 Windows drivers.
 
 The input device's axes and buttons are mapped to software inputs using a
@@ -52,7 +52,7 @@ import shutil
 
 logger = logging.getLogger(__name__)
 
-from cfclient.utils.pysdl2reader import PySDL2Reader
+from cfclient.utils.pygamereader import PyGameReader
 from cfclient.utils.config import Config
 from cfclient.utils.config_manager import ConfigManager
 
@@ -70,7 +70,7 @@ class JoystickReader:
 
     def __init__(self, do_device_discovery=True):
         # TODO: Should be OS dependant
-        self.inputdevice = PySDL2Reader()
+        self.inputdevice = PyGameReader()
         
         self._min_thrust = 0
         self._max_thrust = 0
@@ -81,9 +81,7 @@ class JoystickReader:
         self._has_pressure_sensor = False
 
         self._old_thrust = 0
-        self._old_raw_thrust = 0
         self._old_alt_hold = False
-        self._springy_throttle = True
 
         self._trim_roll = Config().get("trim_roll")
         self._trim_pitch = Config().get("trim_pitch")
@@ -164,7 +162,7 @@ class JoystickReader:
         self._has_pressure_sensor = available
 
     def setAltHold(self, althold):
-        self._old_alt_hold = althold
+        self._old_alt_hold = althold        
 
     def _do_device_discovery(self):
         devs = self.getAvailableDevices()
@@ -215,8 +213,6 @@ class JoystickReader:
             self.inputdevice.start_input(
                                     device_id,
                                     ConfigManager().get_config(config_name))
-            settings = ConfigManager().get_settings(config_name)
-            self._springy_throttle = settings["springythrottle"]
             self._read_timer.start()
         except Exception:
             self.device_error.call(
@@ -305,48 +301,26 @@ class JoystickReader:
                 self.emergency_stop_updated.call(self._emergency_stop)
 
             # Thust limiting (slew, minimum and emergency stop)
-            if self._springy_throttle:
-                if althold and self._has_pressure_sensor:
-                    thrust = int(round(JoystickReader.deadband(thrust,0.2)*32767 + 32767)) #Convert to uint16
-                else:
-                    if raw_thrust < 0.05 or emergency_stop:
-                        thrust = 0
-                    else:
-                        thrust = self._min_thrust + thrust * (self._max_thrust -
-                                                                self._min_thrust)
-                    if (self._thrust_slew_enabled == True and
-                        self._thrust_slew_limit > thrust and not
-                        emergency_stop):
-                        if self._old_thrust > self._thrust_slew_limit:
-                            self._old_thrust = self._thrust_slew_limit
-                        if thrust < (self._old_thrust - (self._thrust_slew_rate / 100)):
-                            thrust = self._old_thrust - self._thrust_slew_rate / 100
-                        if raw_thrust < 0 or thrust < self._min_thrust:
-                            thrust = 0
+            if althold and self._has_pressure_sensor:
+                thrust = int(round(JoystickReader.deadband(thrust,0.2)*32767 + 32767)) #Convert to uint16
+            
             else:
-                thrust = data["thrust"] / 2 + 0.5
-                if althold and self._has_pressure_sensor:
-                    #thrust = int(round(JoystickReader.deadband(thrust,0.2)*32767 + 32767)) #Convert to uint16
-                    thrust = 32767
-                
+                if raw_thrust < 0.05 or emergency_stop:
+                    thrust = 0
                 else:
-                    if raw_thrust < -0.90 or emergency_stop:
+                    thrust = self._min_thrust + thrust * (self._max_thrust -
+                                                            self._min_thrust)
+                if (self._thrust_slew_enabled == True and
+                    self._thrust_slew_limit > thrust and not
+                    emergency_stop):
+                    if self._old_thrust > self._thrust_slew_limit:
+                        self._old_thrust = self._thrust_slew_limit
+                    if thrust < (self._old_thrust - (self._thrust_slew_rate / 100)):
+                        thrust = self._old_thrust - self._thrust_slew_rate / 100
+                    if raw_thrust < 0 or thrust < self._min_thrust:
                         thrust = 0
-                    else:
-                        thrust = self._min_thrust + thrust * (self._max_thrust -
-                                                                self._min_thrust)
-                    if (self._thrust_slew_enabled == True and
-                        self._thrust_slew_limit > thrust and not
-                        emergency_stop):
-                        if self._old_thrust > self._thrust_slew_limit:
-                            self._old_thrust = self._thrust_slew_limit
-                        if thrust < (self._old_thrust - (self._thrust_slew_rate / 100)):
-                            thrust = self._old_thrust - self._thrust_slew_rate / 100
-                        if raw_thrust < -1 or thrust < self._min_thrust:
-                            thrust = 0
 
             self._old_thrust = thrust
-            self._old_raw_thrust = raw_thrust
             # Yaw deadband
             # TODO: Add to input device config?
             yaw = JoystickReader.deadband(yaw,0.2)*self._max_yaw_rate           

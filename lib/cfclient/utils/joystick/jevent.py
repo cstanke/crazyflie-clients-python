@@ -1,6 +1,4 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
 #     ||          ____  _ __
 #  +------+      / __ )(_) /_______________ _____  ___
 #  | 0xBC |     / __  / / __/ ___/ ___/ __ `/_  / / _ \
@@ -20,12 +18,25 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#  MA  02110-1301, USA.
+#  along with this program; if not, write to the Free Software Foundation,
+#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 """
-Bootloading utilities for the Crazyflie.
+Simple event class implementation that fancify a be the event usage.
 """
+
+
+class JEvent(object):
+    """
+    Joystick event class. Encapsulate single joystick event.
+    """
+    def __init__(self, evt_type, number, value):
+        self.type = evt_type
+        self.number = number
+        self.value = value
+
+    def __repr__(self):
+        return "JEvent(type={}, number={}, value={})".format(self.type,
+                   self.number, self.value)

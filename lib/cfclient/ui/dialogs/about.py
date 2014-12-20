@@ -76,7 +76,7 @@ CREDITS_FORMAT = U"""
 <b>Used libraries</b><br>
 <a href="http://qt-project.org/">QT</a><br>
 <a href="http://www.riverbankcomputing.co.uk/software/pyqt/intro">PyQT</a><br>
-<a href="http://pysdl2.readthedocs.org">PySDL2</a><br>
+<a href="http://www.pygame.org/news.html">PyGame</a><br>
 <a href="http://www.pyqtgraph.org/">PyQtGraph</a><br>
 <a href="http://marble.kde.org/">KDE Marble</a><br>
 <a href="http://sourceforge.net/projects/pyusb/">PyUSB</a><br>
@@ -91,31 +91,23 @@ and below is a list of users that have contributed to the crazyflie-pc-client.
 Thanks! <br><br>
 
 Allyn Bauer <br>
-Anton Krasovsky <br>
 Arnaud Taffanel <br>
-Chadwick McHenry <br>
 Daniel Lee <br>
+danmark <br>
 David Benes <br>
+erget <br>
 Gina Häußge <br>
-Jannis Redmann <br>
 Marcus Eliasson <br>
 Marlon Petry <br>
 Mike Voytovich <br>
+omwdunkley <br>
 Philipp A. Mohrenweiser <br>
 Surrender <br>
-Thomas DE BONA <br>
-Tobias Antonsson <br>
-Tyler Anderson <br>
-bitcraze <br>
-cstanke <br>
-danmark <br>
-erget <br>
-omwdunkley <br>
+Tobias Antonsson <br><br>
 
-<br>
 This list of names have been automatically generated using the following command
-in the crazyflie-clients-python repository:<br>
-git shortlog -s | cut -c8-
+in the crazyflie-pc-client repository:<br>
+hg log --template "{author|person}\n" | sort | uniq
 """
 
 class AboutDialog(QtGui.QWidget, about_widget_class):

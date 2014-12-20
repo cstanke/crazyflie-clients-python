@@ -1,6 +1,4 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
 #     ||          ____  _ __
 #  +------+      / __ )(_) /_______________ _____  ___
 #  | 0xBC |     / __  / / __/ ___/ ___/ __ `/_  / / _ \
@@ -20,12 +18,34 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#  MA  02110-1301, USA.
+#  along with this program; if not, write to the Free Software Foundation,
+#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 """
-Bootloading utilities for the Crazyflie.
+Multiplatform python joystick driver
+Back-end currently implemented for linux_udev and pygame
 """
+
+from .constants import TYPE_BUTTON, TYPE_AXIS
+
+try:
+    import linuxjsdev
+
+    if not locals().has_key('Joystick'):
+        from .linuxjsdev import Joystick
+except ImportError:
+    pass
+
+try:
+    import pygamejoystick
+
+    if not locals().has_key('Joystick'):
+        from .pygamejoystick import Joystick
+except ImportError:
+    pass
+
+if not locals().has_key('Joystick'):
+    raise Exception("No suitable Joystick driver. " +
+                    "Driver supported: Linux, pygame.")

@@ -51,8 +51,6 @@ from .console import Console
 from .param import Param
 from .log import Log
 from .toccache import TocCache
-from .mem import Memory
-from .platformservice import PlatformService
 
 import cflib.crtp
 
@@ -111,8 +109,6 @@ class Crazyflie():
         self.log = Log(self)
         self.console = Console(self)
         self.param = Param(self)
-        self.mem = Memory(self)
-        self.platform = PlatformService(self)
 
         self.link_uri = ""
 
@@ -161,15 +157,10 @@ class Crazyflie():
         self.connected_ts = datetime.datetime.now()
         self.connected.call(self.link_uri)
 
-    def _mems_updated_cb(self):
-        """Called when the memroies has been identified"""
-        logger.info("Memories finished updating")
-        self.param.refresh_toc(self._param_toc_updated_cb, self._toc_cache)
-
     def _log_toc_updated_cb(self):
         """Called when the log TOC has been fully updated"""
         logger.info("Log TOC finished updating")
-        self.mem.refresh(self._mems_updated_cb)
+        self.param.refresh_toc(self._param_toc_updated_cb, self._toc_cache)
 
     def _link_error_cb(self, errmsg):
         """Called from the link driver when there's an error"""
@@ -283,7 +274,7 @@ class Crazyflie():
         if len(longest_match) > 0:
             del self._answer_patterns[longest_match]
 
-    def send_packet(self, pk, expected_reply=(), resend=False, timeout=0.2):
+    def send_packet(self, pk, expected_reply=(), resend=False):
         """
         Send a packet through the link interface.
 

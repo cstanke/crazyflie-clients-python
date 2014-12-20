@@ -92,9 +92,9 @@ def main():
         sys.exit(1)
 
     try:
-        import sdl2
+        import pygame
     except ImportError:
-        logger.critical("No pysdl2 installation found, exiting!")
+        logger.critical("No pygame installation found, exiting!")
         sys.exit(1)
 
     try:

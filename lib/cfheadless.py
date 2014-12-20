@@ -96,6 +96,8 @@ class HeadlessClient():
                     self._jr.setAltHoldAvailable(eval(found))))
         self._jr.althold_updated.add_callback(
                 lambda enabled: self._cf.param.set_value("flightmode.althold", enabled))
+        self._jr.ring_effect_updated.add_callback(
+                lambda effect: self._cf.param.set_value("ring.effect", effect))
 
         # 2014-11-18 chad: Set up callbacks to support NeoPixel ring effects
         # in the firmware of the currently connected Crazyflie.
@@ -118,6 +120,7 @@ class HeadlessClient():
                 self._cf.param.request_param_update(param)
             except Exception:
                 pass
+            
 
     def _connection_failed(self, link, message):
         """Callback for a failed Crazyflie connection"""
